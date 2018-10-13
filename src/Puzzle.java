@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.function.ToIntFunction;
 
 public class Puzzle {
 
@@ -27,6 +28,7 @@ public class Puzzle {
         depthFirstSearch.search(initState);
     }
 
+
     public static boolean isGoalState(State state) {
         int[] tiles = state.getTiles();
         boolean isGoal = true;
@@ -38,6 +40,51 @@ public class Puzzle {
         }
         return isGoal;
     }
+
+
+    public static ToIntFunction<State> manhattanDistance() {
+        return new ToIntFunction<State>() {
+            @Override
+            public int applyAsInt(State value) {
+                int[] tiles = value.getTiles();
+                int sumDistance = 0;
+                for (int i = 0; i < 11; i++) {
+                    int currCol = i % 4;
+                    int currRow = i / 4;
+                    int targCol = (tiles[i] - 1) % 4;
+                    int targRow = (tiles[i] - 1) / 4;
+                    int movesToTarg = Math.max(Math.abs(targCol - currCol), Math.abs(targRow - currRow)); //see the report
+                    sumDistance = sumDistance + movesToTarg;
+                }
+
+                return sumDistance;
+            }
+        };
+    }
+
+
+    public static ToIntFunction<State> permutationInversions() {
+        return new ToIntFunction<State>() {
+            @Override
+            public int applyAsInt(State value) {
+                int[] tiles = value.getTiles();
+                int sumCount = 0;
+
+                for (int i = 0; i <= 11; i++) {
+                    int flag = tiles[i];
+                    int count = 0;
+                    for (int j = i + 1; j <= 11; j++) {
+                        if (tiles[j] > flag) {
+                            count++;
+                        }
+                    }
+                    sumCount = sumCount + count;
+                }
+                return sumCount;
+            }
+        };
+    }
+
 
     public static List<State> getPosMoves(State currState) {
         int[] currTiles = currState.getTiles();

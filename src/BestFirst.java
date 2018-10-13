@@ -2,12 +2,16 @@ import java.util.*;
 import java.util.function.ToIntFunction;
 
 public class BestFirst {
-    private Set<State> addedState;
-    private PriorityQueue<State> pQueue;
-    private ToIntFunction<State> heuristic;
+    protected Set<State> addedState;
+    protected PriorityQueue<State> pQueue;
+    protected ToIntFunction<State> heuristic;
+
+    public BestFirst(){
+        this.addedState = new HashSet<>();
+    }
 
     public BestFirst(ToIntFunction<State> heuristic) {
-        this.addedState = new HashSet<>();
+        this();
         this.heuristic = heuristic;
         Comparator<State> priority = (s1, s2) -> this.heuristic.applyAsInt(s2) - this.heuristic.applyAsInt(s1);
         this.pQueue = new PriorityQueue<>(priority);
