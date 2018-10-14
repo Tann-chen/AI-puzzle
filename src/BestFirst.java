@@ -6,26 +6,31 @@ public class BestFirst {
     protected PriorityQueue<State> pQueue;
     protected ToIntFunction<State> heuristic;
 
-    public BestFirst(){
+    public BestFirst() {
         this.addedState = new HashSet<>();
     }
 
     public BestFirst(ToIntFunction<State> heuristic) {
         this();
         this.heuristic = heuristic;
-        Comparator<State> priority = (s1, s2) -> this.heuristic.applyAsInt(s2) - this.heuristic.applyAsInt(s1);
+        Comparator<State> priority = (s1, s2) -> this.heuristic.applyAsInt(s1) - this.heuristic.applyAsInt(s2);
         this.pQueue = new PriorityQueue<>(priority);
     }
 
     public void search(State initState) {
         addedState.add(initState);
         pQueue.offer(initState);
+        int moveCounter = 0;
 
         while (!pQueue.isEmpty()) {
             State currState = pQueue.poll();
+            moveCounter++;
+
+            System.out.println(currState);
 
             if (Puzzle.isGoalState(currState)) {
-                break;
+                System.out.println("[INFO] find the goal state, moves :" + String.valueOf(moveCounter - 1));
+                return;
             }
             // check its children
             List<State> possibleMoves = Puzzle.getPosMoves(currState);
@@ -41,6 +46,6 @@ public class BestFirst {
         }
 
         // fail to find goal
-        System.out.println("[INFO] can not find the goal!");
+        System.out.println("[INFO] can not find the goal state");
     }
 }

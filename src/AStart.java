@@ -8,7 +8,7 @@ public class AStart extends BestFirst {
         super();
         this.heuristic = hFunction;
         this.gFunction = setGFunction();
-        Comparator<State> priority = (s1, s2) -> (this.gFunction.applyAsInt(s2) + this.heuristic.applyAsInt(s2)) - (this.gFunction.applyAsInt(s1) + this.heuristic.applyAsInt(s1));
+        Comparator<State> priority = (s1, s2) -> (this.gFunction.applyAsInt(s1) + this.heuristic.applyAsInt(s1)) - (this.gFunction.applyAsInt(s2) + this.heuristic.applyAsInt(s2));
         this.pQueue = new PriorityQueue<>(priority);
     }
 

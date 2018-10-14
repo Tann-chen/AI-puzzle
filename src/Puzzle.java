@@ -22,10 +22,30 @@ public class Puzzle {
             System.out.println("there is duplicated numbers in array");
             return;
         }
+
         State initState = new State(initial);
 
-        DepthFirst depthFirstSearch = new DepthFirst();
-        depthFirstSearch.search(initState);
+//        DepthFirst depthFirstSearch = new DepthFirst();
+//        depthFirstSearch.search(initState);
+
+//        BestFirst bfH1 = new BestFirst(heuristic1());
+//        bfH1.search(initState);
+//
+//        AStart asH1 = new AStart(heuristic1());
+//        asH1.search(initState);
+
+
+//        BestFirst bfH2 = new BestFirst(heuristic2());
+//        bfH2.search(initState);
+//
+//        AStart asH2 = new AStart(heuristic2());
+//        asH2.search(initState);
+
+        BestFirst bfH3 = new BestFirst(heuristic3());
+        bfH3.search(initState);
+
+        AStart asH3 = new AStart(heuristic3());
+        asH3.search(initState);
     }
 
 
@@ -42,7 +62,7 @@ public class Puzzle {
     }
 
 
-    public static ToIntFunction<State> manhattanDistance() {
+    public static ToIntFunction<State> heuristic1() {
         return new ToIntFunction<State>() {
             @Override
             public int applyAsInt(State value) {
@@ -63,7 +83,7 @@ public class Puzzle {
     }
 
 
-    public static ToIntFunction<State> permutationInversions() {
+    public static ToIntFunction<State> heuristic2() {
         return new ToIntFunction<State>() {
             @Override
             public int applyAsInt(State value) {
@@ -81,6 +101,38 @@ public class Puzzle {
                     sumCount = sumCount + count;
                 }
                 return sumCount;
+            }
+        };
+    }
+
+    public static ToIntFunction<State> heuristic3() {
+        return new ToIntFunction<State>() {
+            @Override
+            public int applyAsInt(State value) {
+                int[] tiles = value.getTiles();
+                int val = 0;
+
+                //check rows
+                for (int i = 0; i <= 2; i++) {
+                    for (int j = 0; j < 3; j++) {
+                        if (tiles[i * 4 + j] > tiles[i * 4 + j + 1]) {
+                            val++;
+                            break;
+                        }
+                    }
+                }
+
+                //check cols
+                for (int j = 0; j <= 3; j++) {
+                    for (int i = 0; i < 2; i++) {
+                        if (tiles[i * 4 + j] > tiles[i * 4 + 4 + j]) {
+                            val++;
+                            break;
+                        }
+                    }
+                }
+
+                return val;
             }
         };
     }
