@@ -63,6 +63,6 @@ public class State {
 
     @Override
     public String toString() {
-        return Arrays.stream(this.tiles).mapToObj(String::valueOf).collect(Collectors.joining(","));
+        return "[" + Arrays.stream(this.tiles).mapToObj(String::valueOf).collect(Collectors.joining(",")) + "]";
     }
 }

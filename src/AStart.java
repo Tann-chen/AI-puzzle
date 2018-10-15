@@ -26,4 +26,38 @@ public class AStart extends BestFirst {
             }
         };
     }
+
+    @Override
+    public void search(State initState, String outputFile) {
+        addedState.add(initState);
+        pQueue.offer(initState);
+        int moveCounter = 0;
+
+        while (!pQueue.isEmpty()) {
+            State currState = pQueue.poll();
+            moveCounter++;
+
+            System.out.println(currState);
+
+            if (Puzzle.isGoalState(currState)) {
+                System.out.println("[INFO] find the goal state, Search path moves :" + String.valueOf(moveCounter - 1));
+                Puzzle.outputSolutionPath(currState, "puzzleAS-" + outputFile + ".txt");
+                return;
+            }
+            // check its children
+            List<State> possibleMoves = Puzzle.getPosMoves(currState);
+            List<State> children = new ArrayList<>();
+            for (State s : possibleMoves) {
+                if (!addedState.contains(s)) {
+                    addedState.add(s);
+                    pQueue.offer(s);
+                    children.add(s);
+                }
+            }
+            currState.setChildren(children);
+        }
+
+        // fail to find goal
+        System.out.println("[INFO] can not find the goal state");
+    }
 }

@@ -1,3 +1,6 @@
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 import java.util.function.ToIntFunction;
 
@@ -25,29 +28,33 @@ public class Puzzle {
 
         State initState = new State(initial);
 
-//        DepthFirst depthFirstSearch = new DepthFirst();
-//        depthFirstSearch.search(initState);
+        BestFirst bfH3 = new BestFirst(heuristicFirst());
+        bfH3.search(initState, "h1");
 
-//        BestFirst bfH1 = new BestFirst(heuristic1());
-//        bfH1.search(initState);
+        AStart asH3 = new AStart(heuristicFirst());
+        asH3.search(initState, "h1");
+
+        BestFirst bfH1 = new BestFirst(heuristicSecond());
+        bfH1.search(initState, "h2");
+
+        AStart asH1 = new AStart(heuristicSecond());
+        asH1.search(initState, "h2");
+
+        DepthFirst depthFirstSearch = new DepthFirst();
+        depthFirstSearch.search(initState);
+
+//        BestFirst bfH4 = new BestFirst(hammingDistance());
+//        bfH4.search(initState, "hammingDistance");
+//        AStart asH4 = new AStart(hammingDistance());
+//        asH4.search(initState, "hammingDistance");
+
+
+//        BestFirst bfH2 = new BestFirst(permutationInversion());
+//        bfH2.search(initState, "permutationInverse");
 //
-//        AStart asH1 = new AStart(heuristic1());
-//        asH1.search(initState);
-
-
-//        BestFirst bfH2 = new BestFirst(heuristic2());
-//        bfH2.search(initState);
-//
-//        AStart asH2 = new AStart(heuristic2());
-//        asH2.search(initState);
-
-        BestFirst bfH3 = new BestFirst(heuristic3());
-        bfH3.search(initState);
-
-        AStart asH3 = new AStart(heuristic3());
-        asH3.search(initState);
+//        AStart asH2 = new AStart(permutationInversion());
+//        asH2.search(initState,"permutationInverse");
     }
-
 
     public static boolean isGoalState(State state) {
         int[] tiles = state.getTiles();
@@ -61,51 +68,7 @@ public class Puzzle {
         return isGoal;
     }
 
-
-    public static ToIntFunction<State> heuristic1() {
-        return new ToIntFunction<State>() {
-            @Override
-            public int applyAsInt(State value) {
-                int[] tiles = value.getTiles();
-                int sumDistance = 0;
-                for (int i = 0; i < 11; i++) {
-                    int currCol = i % 4;
-                    int currRow = i / 4;
-                    int targCol = (tiles[i] - 1) % 4;
-                    int targRow = (tiles[i] - 1) / 4;
-                    int movesToTarg = Math.max(Math.abs(targCol - currCol), Math.abs(targRow - currRow)); //see the report
-                    sumDistance = sumDistance + movesToTarg;
-                }
-
-                return sumDistance;
-            }
-        };
-    }
-
-
-    public static ToIntFunction<State> heuristic2() {
-        return new ToIntFunction<State>() {
-            @Override
-            public int applyAsInt(State value) {
-                int[] tiles = value.getTiles();
-                int sumCount = 0;
-
-                for (int i = 0; i <= 11; i++) {
-                    int flag = tiles[i];
-                    int count = 0;
-                    for (int j = i + 1; j <= 11; j++) {
-                        if (tiles[j] > flag) {
-                            count++;
-                        }
-                    }
-                    sumCount = sumCount + count;
-                }
-                return sumCount;
-            }
-        };
-    }
-
-    public static ToIntFunction<State> heuristic3() {
+    public static ToIntFunction<State> heuristicFirst() {
         return new ToIntFunction<State>() {
             @Override
             public int applyAsInt(State value) {
@@ -133,6 +96,65 @@ public class Puzzle {
                 }
 
                 return val;
+            }
+        };
+    }
+
+    // sum of max offset
+    public static ToIntFunction<State> heuristicSecond() {
+        return new ToIntFunction<State>() {
+            @Override
+            public int applyAsInt(State value) {
+                int[] tiles = value.getTiles();
+                int sumDistance = 0;
+                for (int i = 0; i < 11; i++) {
+                    int currCol = i % 4;
+                    int currRow = i / 4;
+                    int targCol = (tiles[i] - 1) % 4;
+                    int targRow = (tiles[i] - 1) / 4;
+                    int movesToTarg = Math.max(Math.abs(targCol - currCol), Math.abs(targRow - currRow)); //see the report
+                    sumDistance = sumDistance + movesToTarg;
+                }
+
+                return sumDistance;
+            }
+        };
+    }
+
+    public static ToIntFunction<State> hammingDistance() {
+        return new ToIntFunction<State>() {
+            @Override
+            public int applyAsInt(State value) {
+                int[] tiles = value.getTiles();
+                int count = 0;
+                for (int i = 0; i < 11; i++) {
+                    if (tiles[i] != i + 1) {
+                        count++;
+                    }
+                }
+                return count;
+            }
+        };
+    }
+
+    public static ToIntFunction<State> permutationInversion() {
+        return new ToIntFunction<State>() {
+            @Override
+            public int applyAsInt(State value) {
+                int[] tiles = value.getTiles();
+                int sumCount = 0;
+
+                for (int i = 0; i <= 11; i++) {
+                    int flag = tiles[i];
+                    int count = 0;
+                    for (int j = i + 1; j <= 11; j++) {
+                        if (tiles[j] > flag) {
+                            count++;
+                        }
+                    }
+                    sumCount = sumCount + count;
+                }
+                return sumCount;
             }
         };
     }
@@ -228,5 +250,30 @@ public class Puzzle {
         }
 
         return possibleMoves;
+    }
+
+    public static void outputSolutionPath(State goal, String outputFilename) {
+        State current = goal;
+        int moves = 0;
+        List<String> container = new ArrayList<>();
+
+        while (current.getParent() != null) {
+            container.add(current.toString() + "\n");
+            moves++;
+            current = current.getParent();
+        }
+        container.add(current.toString() + "\n"); //add the root
+        System.out.println("Solution Path Moves:" + String.valueOf(moves));
+
+        //write to file
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(outputFilename));
+            for (int i = container.size() - 1; i >= 0; i--) {
+                writer.write(container.get(i));
+            }
+            writer.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

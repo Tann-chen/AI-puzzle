@@ -17,7 +17,7 @@ public class BestFirst {
         this.pQueue = new PriorityQueue<>(priority);
     }
 
-    public void search(State initState) {
+    public void search(State initState, String outputFile) {
         addedState.add(initState);
         pQueue.offer(initState);
         int moveCounter = 0;
@@ -29,7 +29,8 @@ public class BestFirst {
             System.out.println(currState);
 
             if (Puzzle.isGoalState(currState)) {
-                System.out.println("[INFO] find the goal state, moves :" + String.valueOf(moveCounter - 1));
+                System.out.println("[INFO] find the goal state, Search path moves :" + String.valueOf(moveCounter - 1));
+                Puzzle.outputSolutionPath(currState, "puzzleBFS-" + outputFile + ".txt");
                 return;
             }
             // check its children
